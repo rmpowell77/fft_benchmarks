@@ -23,6 +23,7 @@ project(
   LANGUAGES CXX)
 
 add_executable(fft_benchmark fft_benchmark.cpp)
-target_link_libraries(fft_benchmark PRIVATE nanobench)
+find_library(ACCELERATE_LIB Accelerate)
+target_link_libraries(fft_benchmark PRIVATE nanobench ${ACCELERATE_LIB})
 
 
