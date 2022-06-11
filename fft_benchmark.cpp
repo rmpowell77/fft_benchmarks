@@ -1,8 +1,9 @@
-#include <complex>
-#include <numbers>
-#include <fftw3.h>
-#include <iostream>
 #include <cmath>
+#include <complex>
+#include <fftw3.h>
+#include <nanobench.h>
+#include <iostream>
+#include <numbers>
 #include <vector>
 
 struct FFT {
@@ -38,22 +39,34 @@ struct FFT {
 };
 
 int main() {
-    auto fft = FFT(4);
+  auto fft = FFT(4);
 
   auto in = std::vector<FFT::complex>(fft.N);
   for (auto i = 0; i < fft.N; ++i) {
-    in[i] = cos(i * 2 * std::numbers::pi/fft.N);
+    in[i] = cos(i * 2 * std::numbers::pi / fft.N);
   }
 
-  std::cout<<"Input: ";
-  std::copy(in.begin(), in.end(), std::ostream_iterator<FFT::complex>(std::cout, ", "));
-  std::cout<<"\n";
+  std::cout << "Input: ";
+  std::copy(in.begin(), in.end(),
+            std::ostream_iterator<FFT::complex>(std::cout, ", "));
+  std::cout << "\n";
 
   fft.fill_input(in);
   fft.execute();
   auto out = fft.fetch_output();
 
-  std::cout<<"\nOutput: ";
-  std::copy(out.begin(), out.end(), std::ostream_iterator<FFT::complex>(std::cout, ", "));
-  std::cout<<"\n";
+  std::cout << "\nOutput: ";
+  std::copy(out.begin(), out.end(),
+            std::ostream_iterator<FFT::complex>(std::cout, ", "));
+  std::cout << "\n";
+  for (auto i : { 7, 8, 9, 10, 11, 12}) {
+    auto fft = FFT(i);
+    auto in = std::vector<FFT::complex>(fft.N);
+    for (auto i = 0; i < fft.N; ++i) {
+      in[i] = cos(i * 2 * std::numbers::pi/fft.N);
+    }
+    ankerl::nanobench::Bench().run(std::string("fftw ") + std::to_string(fft.N) , [&] {
+        fft.execute();
+    });
+  }
 }
